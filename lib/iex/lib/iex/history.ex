@@ -13,7 +13,8 @@ defmodule IEx.History do
   @doc """
   Appends one entry to the history.
   """
-  def append(%History{} = state, entry, limit) do
+  def append(state, entry, limit), do: if history_enabled?, do: do_append(state, entry, limit), else: state
+  def do_append(%History{} = state, entry, limit) do
     {collect?, state} =
       state
       |> append(entry)
@@ -122,5 +123,11 @@ defmodule IEx.History do
   defp has_bin(tuple, index) do
     has_bin(elem(tuple, index))
     has_bin(tuple, index - 1)
+  end
+
+  defp history_enabled?() do
+    "ERL_AFLAGS" 
+    |> System.get_env()
+    |> String.match?(~r/shell_history enabled/)
   end
 end
